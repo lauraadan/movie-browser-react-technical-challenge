@@ -1,9 +1,9 @@
 import React from "react";
 import Carousel from "../components/Carousel";
 import Banner from "../components/Banner";
-import { useInitialData } from "../common/hooks/useInitialData";
-import { fetchCategory, TMDBMovie } from "../service/api";
+import { TMDBMovie } from "../service/api";
 import Loading from "../common/components/Loading";
+import { useMovies } from "../common/hooks/useMovies";
 
 // TODO GESTIONAR ERROR
 // TODO GESTIONAR MEDIA QUERIES
@@ -11,46 +11,32 @@ import Loading from "../common/components/Loading";
 // TODO Hover en botones
 // TODO Mover interface a archivo externo
 
-type HomeData = {
-  categories?: {
-    popular: TMDBMovie[];
-    top_rated: TMDBMovie[];
-    now_playing: TMDBMovie[];
-  };
-};
-
 export default function Home() {
-  const initial = useInitialData<HomeData>();
-  const [data, setData] = React.useState<HomeData["categories"] | null>(
-    initial.categories || null
-  );
+  const popular = useMovies("popular");
+  const topRated = useMovies("top_rated");
+  const nowPlaying = useMovies("now_playing");
+  const loading = popular.loading || topRated.loading || nowPlaying.loading;
+  const error = popular.error || topRated.error || nowPlaying.error;
 
-  React.useEffect(() => {
-    if (!data) {
-      Promise.all([
-        fetchCategory("popular"),
-        fetchCategory("top_rated"),
-        fetchCategory("now_playing"),
-      ]).then(([popular, top_rated, now_playing]) =>
-        setData({ popular, top_rated, now_playing })
-      );
-    }
-  }, []);
-
-  if (!data) return <Loading />;
+  if (loading) return <Loading />;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <>
       <div className="hero">
-        <Banner items={data.popular.slice(0, 5)} category="popular" />
+        <Banner items={popular.movies.slice(0, 5)} category="popular" />
       </div>
 
-      <Carousel title="Popular" category="popular" items={data.popular} />
-      <Carousel title="Top Rated" category="top_rated" items={data.top_rated} />
+      <Carousel title="Popular" category="popular" items={popular.movies} />
+      <Carousel
+        title="Top Rated"
+        category="top_rated"
+        items={topRated.movies}
+      />
       <Carousel
         title="Now Playing"
         category="now_playing"
-        items={data.now_playing}
+        items={nowPlaying.movies}
       />
     </>
   );

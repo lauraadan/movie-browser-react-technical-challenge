@@ -15,7 +15,7 @@ export default function BackToHome() {
   return (
     <button className="arrow arrow__back" onClick={handleBack}>
       <span className="material-icons">chevron_left</span>
-      <h3> Back to home</h3>
+      <h3> Back</h3>
     </button>
   );
 }

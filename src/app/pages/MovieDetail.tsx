@@ -1,29 +1,23 @@
 import React from "react";
-
 import { useParams, useSearchParams } from "react-router-dom";
-import { IMG, fetchMovie, TMDBMovie } from "../service/api";
-import { useInitialData } from "../common/hooks/useInitialData";
+import { IMG } from "../service/api";
+import { useMovieDetail } from "../common/hooks/useMovies";
 import { useWishlist } from "../common/hooks/useWishlist";
 import Loading from "../common/components/Loading";
 import BackToHome from "../common/components/BackToHome";
+import Error from "../common/components/Error";
+import NotFound from "./NotFound";
 
 export default function MovieDetail() {
   const { id } = useParams();
   const [params] = useSearchParams();
-  const cat = params.get("cat") || "popular";
-  const initial = useInitialData<{ movie?: TMDBMovie; category?: string }>();
-  const [movie, setMovie] = React.useState<TMDBMovie | null>(
-    initial.movie || null
-  );
+
+  const { movie, loading, error } = useMovieDetail(id ? Number(id) : undefined);
   const { add, remove, has } = useWishlist();
 
-  React.useEffect(() => {
-    if (!movie && id) {
-      fetchMovie(id).then(setMovie);
-    }
-  }, [id]);
-
-  if (!movie) return <Loading />;
+  if (loading) return <Loading />;
+  if (error) return <Error />;
+  if (!movie) return <NotFound />;
 
   const isFav = has(movie.id);
 
@@ -47,6 +41,7 @@ export default function MovieDetail() {
   return (
     <div className="detail">
       <BackToHome />
+
       <div className="detail__banner">
         <img
           src={IMG.backdrop(movie.backdrop_path, "w1280")}
@@ -63,12 +58,13 @@ export default function MovieDetail() {
         <div className="detail__meta">
           <h1 className="detail__title">{movie.title}</h1>
           <p className="detail__overview">{movie.overview}</p>
+
           <div className="detail__actions">
             <button
               className={
                 isFav
                   ? "btn--wishlist-secondary btn"
-                  : " btn btn--wishlist-primary"
+                  : "btn btn--wishlist-primary"
               }
               onClick={handleToggle}
             >
@@ -76,6 +72,7 @@ export default function MovieDetail() {
               {isFav ? "Remove from wishlist" : "Add to wishlist"}
             </button>
           </div>
+
           <div className="detail__info">
             <span>Rating: {movie.vote_average.toFixed(1)}</span>
             <span>Release: {movie.release_date}</span>
