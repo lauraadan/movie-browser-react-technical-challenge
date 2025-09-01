@@ -1,5 +1,6 @@
 import React from "react";
-import { TMDBMovie, IMG } from "../service/api";
+import { IMG } from "../service/api";
+import { TMDBMovie } from "../../types/interfaces";
 import { Link } from "react-router-dom";
 
 type Props = {
@@ -15,7 +16,7 @@ export default function Banner({ items, category }: Props) {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % length);
-    }, 4000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [length]);
 

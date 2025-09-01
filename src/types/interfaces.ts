@@ -16,6 +16,13 @@ export interface TMDBMovie {
   vote_average: number;
   release_date: string;
   addedAt: string;
+  genre_ids: string;
+}
+
+export interface GenreWithMovies {
+  genreId: number;
+  genreName: string;
+  movies: TMDBMovie[];
 }
 
 /** Wishlist domain */

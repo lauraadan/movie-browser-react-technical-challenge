@@ -69,6 +69,35 @@ async function fetchHomeData() {
   };
 }
 
+async function fetchGenresWithMovies() {
+  const genresData = await tmdb("/genre/movie/list?language=es-ES");
+  const genres = genresData.genres;
+  const MOVIES_PER_GENRE = 20;
+
+  const genrePromises = genres.map(async (genre) => {
+    try {
+      const moviesData = await tmdb(
+        `/discover/movie?with_genres=${genre.id}&language=es-ES&page=1`
+      );
+
+      return {
+        genreId: genre.id,
+        genreName: genre.name,
+        movies: moviesData.results.slice(0, MOVIES_PER_GENRE),
+      };
+    } catch (e) {
+      console.error(`Error fetching movies for genre ${genre.name}:`, e);
+      return null;
+    }
+  });
+
+  const results = await Promise.all(genrePromises);
+
+  const genresWithMovies = results.filter((g) => g && g.movies.length > 0);
+
+  return genresWithMovies;
+}
+
 async function fetchMovieData(id, category) {
   const movie = await tmdb(`/movie/${id}`);
   return {
@@ -90,6 +119,14 @@ app.get("/api/movies", async (req, res) => {
   }
 });
 
+app.get("/api/genres", async (req, res) => {
+  try {
+    const genresWithMovies = await fetchGenresWithMovies();
+    res.json({ genres: genresWithMovies });
+  } catch (e) {
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
 app.get("/api/movie/:id", async (req, res) => {
   try {
     const data = await tmdb(`/movie/${req.params.id}`);
@@ -130,6 +167,8 @@ const start = async () => {
         const id = match?.[1];
         const cat = match?.[2];
         initialState = await fetchMovieData(id, cat);
+      } else if (url.startsWith("/categories")) {
+        initialState = await fetchGenresWithMovies();
       } else if (url.startsWith("/wishlist")) {
         initialState = { page: "wishlist" };
       } else {

@@ -6,5 +6,5 @@ export const ROUTES = {
 } as const;
 
 export const MESSAGES = {
-  ERROR_GENERIC: "Something went wrong. Please try again.",
+  ERROR_GENERIC: "Something went wrong.",
 } as const;

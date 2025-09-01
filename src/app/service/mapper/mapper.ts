@@ -1,8 +1,8 @@
 /**
  * This mapper file contains functions to transform TMDB API data into application-specific formats.
  */
-
-import { TMDBMovie, IMG } from "../api";
+import { IMG } from "../api";
+import { TMDBMovie } from "../../../types/interfaces";
 
 /**
  * Converts a raw TMDB movie API response into a simplified TMDBMovie object
@@ -19,6 +19,7 @@ export const mapMovie = (apiData: any): TMDBMovie => {
     vote_average: apiData.vote_average,
     release_date: apiData.release_date,
     addedAt: new Date().toISOString(),
+    genre_ids: apiData.genre_ids,
   };
 };
 

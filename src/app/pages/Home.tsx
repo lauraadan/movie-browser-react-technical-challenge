@@ -1,15 +1,12 @@
 import React from "react";
 import Carousel from "../components/Carousel";
 import Banner from "../components/Banner";
-import { TMDBMovie } from "../service/api";
 import Loading from "../common/components/Loading";
 import { useMovies } from "../common/hooks/useMovies";
+import Error from "../common/components/Error";
 
-// TODO GESTIONAR ERROR
 // TODO GESTIONAR MEDIA QUERIES
-// TODO GESTIONAR CONTEXT DONDE VENGA LOS ERRORS Y LOADINGS
 // TODO Hover en botones
-// TODO Mover interface a archivo externo
 
 export default function Home() {
   const popular = useMovies("popular");
@@ -19,7 +16,7 @@ export default function Home() {
   const error = popular.error || topRated.error || nowPlaying.error;
 
   if (loading) return <Loading />;
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <Error />;
 
   return (
     <>

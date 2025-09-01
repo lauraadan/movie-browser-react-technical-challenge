@@ -1,13 +1,4 @@
-export type TMDBMovie = {
-  id: number;
-  title: string;
-  overview: string;
-  poster_path: string | null;
-  backdrop_path: string | null;
-  vote_average: number;
-  release_date: string;
-  addedAt: string;
-};
+import { TMDBMovie, GenreWithMovies } from "../../types/interfaces";
 
 export const IMG = {
   poster: (path: string | null, size: "w185" | "w342" | "w500" = "w342") =>
@@ -22,18 +13,27 @@ export const IMG = {
 };
 
 export async function fetchCategory(category: string): Promise<TMDBMovie[]> {
-  const r = await fetch(`/api/movies?category=${encodeURIComponent(category)}`);
-  return r.json();
-}
-
-export async function fetchMovie(id: string) {
-  const res = await fetch(`/api/movie/${id}`);
+  const res = await fetch(
+    `/api/movies?category=${encodeURIComponent(category)}`
+  );
+  if (!res.ok) throw new Error(`Failed to fetch category ${category}`);
   return res.json();
 }
 
-// Wishlist cookie helpers (client-side)
-// We store only an array of numeric IDs in the cookie for robustness,
-// then fetch full movie objects server-side or on-demand in the client.
+export async function fetchMovie(id: string): Promise<TMDBMovie> {
+  const res = await fetch(`/api/movie/${id}`);
+  if (!res.ok) throw new Error(`Failed to fetch movie ${id}`);
+  return res.json();
+}
+
+export async function fetchMoviesByGenre(): Promise<GenreWithMovies[]> {
+  const res = await fetch(`/api/genres`);
+  if (!res.ok) throw new Error("Failed to fetch genres");
+  const data = await res.json();
+  return Array.isArray(data) ? data : data.genres;
+}
+
+// Wishlist cookie helpers
 export function readWishlistIds(): number[] {
   try {
     const m = document.cookie.match(/(?:^|; )wishlist=([^;]+)/);

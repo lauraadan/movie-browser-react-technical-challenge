@@ -10,9 +10,7 @@ import NotFound from "./NotFound";
 
 export default function MovieDetail() {
   const { id } = useParams();
-  const [params] = useSearchParams();
-
-  const { movie, loading, error } = useMovieDetail(id ? Number(id) : undefined);
+  const { movie, loading, error } = useMovieDetail(Number(id));
   const { add, remove, has } = useWishlist();
 
   if (loading) return <Loading />;
