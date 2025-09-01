@@ -5,10 +5,11 @@ import Loading from "../common/components/Loading";
 
 export default function Wishlist() {
   const initial = useInitialData<{ wishlist?: TMDBMovie[] }>();
-  const { list, remove } = useWishlist();
+const { list, remove } = useWishlist();
 
-  const items = list.length ? list : initial.wishlist || [];
-  if (!list) return <Loading />;
+if (!list) return <Loading />; 
+
+const items = list.length ? list : initial.wishlist || [];
   return (
     <>
       <h1>Wishlist</h1>

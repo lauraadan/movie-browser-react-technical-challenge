@@ -34,7 +34,6 @@ export async function fetchMovie(id: string) {
 // Wishlist cookie helpers (client-side)
 // We store only an array of numeric IDs in the cookie for robustness,
 // then fetch full movie objects server-side or on-demand in the client.
-
 export function readWishlistIds(): number[] {
   try {
     const m = document.cookie.match(/(?:^|; )wishlist=([^;]+)/);

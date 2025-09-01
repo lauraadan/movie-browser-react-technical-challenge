@@ -1,7 +1,6 @@
 import React from "react";
 
-export type InitialData = any; // puedes tiparlo más adelante si quieres
-
+export type InitialData = any;
 export const Ctx = React.createContext<InitialData>({});
 
 export const InitialDataProvider = ({

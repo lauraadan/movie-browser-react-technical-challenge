@@ -24,7 +24,6 @@ export const WishlistProvider = ({
 }) => {
   const [list, setList] = React.useState<TMDBMovie[]>(initial || []);
 
-  // Carga inicial desde cookies si no hay SSR
   React.useEffect(() => {
     if (list.length === 0 && typeof window !== "undefined") {
       const ids = readWishlistIds();

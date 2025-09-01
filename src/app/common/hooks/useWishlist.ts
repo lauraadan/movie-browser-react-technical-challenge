@@ -4,11 +4,9 @@ import { useAlert } from "./useAlert";
 
 export const useWishlist = (): WishlistCtx => {
   const ctx = React.useContext(Ctx);
-  const { showAlert } = useAlert(); // 👈 usamos alert dentro del hook
-
+  const { showAlert } = useAlert(); 
   if (!ctx) throw new Error("useWishlist must be used within WishlistProvider");
 
-  // Re-definimos add y remove para disparar alert
   const addWithAlert = (movie: Parameters<WishlistCtx["add"]>[0]) => {
     ctx.add(movie);
     showAlert(`${movie.title} added to wishlist `);
