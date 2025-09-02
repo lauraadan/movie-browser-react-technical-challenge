@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, vi, expect } from "vitest";
 import * as ReactDOMClient from "react-dom/client";
-import { InitialDataProvider } from "./app/common/context/initialData";
+import { InitialDataProvider } from "./app/context/initialDataContext/initialData";
 import App from "./app/App";
 import { BrowserRouter } from "react-router-dom";
 import React from "react";

@@ -3,21 +3,23 @@ import { render, screen } from "@testing-library/react";
 import App from "./App";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("./components/Navbar", () => ({ default: () => <div>Navbar</div> }));
-vi.mock("./pages/Home", () => ({ default: () => <div>Home Page</div> }));
-vi.mock("./pages/MovieDetail", () => ({
+vi.mock("./components/Navbar/Navbar", () => ({
+  default: () => <div>Navbar</div>,
+}));
+vi.mock("./pages/Home/Home", () => ({ default: () => <div>Home Page</div> }));
+vi.mock("./pages/MovieDetail/MovieDetail", () => ({
   default: () => <div>Movie Detail Page</div>,
 }));
-vi.mock("./pages/Wishlist", () => ({
+vi.mock("./pages/Wishlist/Wishlist", () => ({
   default: () => <div>Wishlist Page</div>,
 }));
-vi.mock("./pages/NotFound", () => ({
+vi.mock("./pages/NotFound/NotFound", () => ({
   default: () => <div>Not Found Page</div>,
 }));
-vi.mock("./pages/Categories", () => ({
+vi.mock("./pages/Categories/Categories", () => ({
   default: () => <div>Categories Page</div>,
 }));
-vi.mock("./common/components/Alert", () => ({
+vi.mock("./components/Alert/Alert", () => ({
   default: () => <div>Alert Component</div>,
 }));
 

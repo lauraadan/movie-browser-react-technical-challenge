@@ -1,16 +1,16 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import MovieDetail from "./pages/MovieDetail";
-import Wishlist from "./pages/Wishlist";
-import NotFound from "./pages/NotFound";
-import Categories from "./pages/Categories";
+import Navbar from "./components/Navbar/Navbar";
+import Home from "./pages/Home/Home";
+import MovieDetail from "./pages/Detail/MovieDetail";
+import Wishlist from "./pages/Wishlist/Wishlist";
+import NotFound from "./pages/NotFound/NotFound";
+import Categories from "./pages/Categories/Categories";
 import { Layout } from "./layout/Layout";
-import { ROUTES } from "./common/constants/constants";
-import { WishlistProvider } from "./common/context/wishlistContext";
-import { AlertProvider } from "./common/context/alertContext";
-import Alert from "./common/components/Alert";
+import { ROUTES } from "./constants/constants";
+import { WishlistProvider } from "./context/wishlistContext/wishlistContext";
+import { AlertProvider } from "./context/alertContext/alertContext";
+import Alert from "./components/Alert/Alert";
 import "../styles/globals.scss";
 import "../styles/main.scss";
 

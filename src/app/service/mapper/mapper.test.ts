@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import { mapMovie, getMoviePoster, getMovieBackdrop } from "./mapper";
-import { IMG } from "../api";
 
 vi.mock("../api", () => ({
   IMG: {
