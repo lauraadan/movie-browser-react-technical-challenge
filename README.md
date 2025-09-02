@@ -108,5 +108,5 @@ A handcrafted, server‑side rendered React app bundled with Vite. It lets you b
 
 ## Extending & testing
 
-- Add unit tests with Vitest/RTL and an E2E suite with Playwright. (Omitted to keep the footprint small.)
+- Add unit tests with Vitest/RTL
 - Add CI that runs `npm ci && npm run typecheck && npm run build`.
