@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../constants/constants";
 
-export default function BackToHome() {
+export default function BackToHome(): JSX.Element {
   const navigate = useNavigate();
 
   const handleBack = () => {

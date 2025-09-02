@@ -1,12 +1,15 @@
 import { TMDBMovie, GenreWithMovies } from "../../types/interfaces";
 
 export const IMG = {
-  poster: (path: string | null, size: "w185" | "w342" | "w500" = "w342") =>
+  poster: (
+    path: string | null,
+    size: "w185" | "w342" | "w500" = "w342"
+  ): string =>
     path ? `https://image.tmdb.org/t/p/${size}${path}` : "/placeholder.jpg",
   backdrop: (
     path: string | null,
     size: "w780" | "w1280" | "original" = "w780"
-  ) =>
+  ): string =>
     path
       ? `https://image.tmdb.org/t/p/${size}${path}`
       : "/placeholder-wide.jpg",
@@ -33,19 +36,18 @@ export async function fetchMoviesByGenre(): Promise<GenreWithMovies[]> {
   return Array.isArray(data) ? data : data.genres;
 }
 
-// Wishlist cookie helpers
 export function readWishlistIds(): number[] {
   try {
-    const m = document.cookie.match(/(?:^|; )wishlist=([^;]+)/);
-    return m
-      ? JSON.parse(decodeURIComponent(m[1])).map((x: any) => Number(x))
+    const match = document.cookie.match(/(?:^|; )wishlist=([^;]+)/);
+    return match
+      ? JSON.parse(decodeURIComponent(match[1])).map((x: any) => Number(x))
       : [];
   } catch {
     return [];
   }
 }
 
-export function writeWishlistIds(ids: number[]) {
+export function writeWishlistIds(ids: number[]): void {
   try {
     const value = encodeURIComponent(JSON.stringify(ids));
     document.cookie = `wishlist=${value}; path=/; max-age=31536000`;
@@ -53,7 +55,7 @@ export function writeWishlistIds(ids: number[]) {
 }
 
 export async function loadMoviesByIds(ids: number[]): Promise<TMDBMovie[]> {
-  if (!ids || ids.length === 0) return [];
+  if (!ids.length) return [];
   const results = await Promise.all(
     ids.map((id) => fetch(`/api/movie/${id}`).then((r) => r.json()))
   );

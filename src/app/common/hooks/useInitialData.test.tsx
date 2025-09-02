@@ -2,14 +2,19 @@ import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { InitialDataProvider } from "../context/initialData";
 import { useInitialData } from "./useInitialData";
+import { AppInitialData } from "../../../types/interfaces";
 
 describe("useInitialData hook", () => {
   it("returns the context value provided by InitialDataProvider", () => {
-    const testValue = { user: "Alice", age: 30 };
-    let contextValue: any = null;
+    const testValue: AppInitialData = {
+      categories: [],
+      trending: [],
+    };
+
+    let contextValue: AppInitialData | null = null;
 
     const TestComponent = () => {
-      contextValue = useInitialData<typeof testValue>();
+      contextValue = useInitialData();
       return null;
     };
 
@@ -19,15 +24,20 @@ describe("useInitialData hook", () => {
       </InitialDataProvider>
     );
 
-    expect(contextValue).toEqual(testValue);
+    expect(contextValue).not.toBeNull();
+    expect(contextValue!).toEqual(testValue);
   });
 
-  it("returns correct type when using generics", () => {
-    const testValue = { id: 1, title: "Movie" };
-    let contextValue: { id: number; title: string } | null = null;
+  it("ensures type safety with expected structure", () => {
+    const testValue: AppInitialData = {
+      categories: [],
+      trending: [],
+    };
+
+    let contextValue: AppInitialData | null = null;
 
     const TestComponent = () => {
-      contextValue = useInitialData<{ id: number; title: string }>();
+      contextValue = useInitialData();
       return null;
     };
 
@@ -37,8 +47,8 @@ describe("useInitialData hook", () => {
       </InitialDataProvider>
     );
 
-    expect(contextValue).toEqual(testValue);
-    expect(contextValue?.id).toBe(1);
-    expect(contextValue?.title).toBe("Movie");
+    expect(contextValue).not.toBeNull();
+    expect(Array.isArray(contextValue!.categories)).toBe(true);
+    expect(Array.isArray(contextValue!.trending)).toBe(true);
   });
 });

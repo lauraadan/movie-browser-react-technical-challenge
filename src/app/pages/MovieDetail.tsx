@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import React, { FC } from "react";
+import { useParams } from "react-router-dom";
 import { IMG } from "../service/api";
 import { useMovieDetail } from "../common/hooks/useMovies";
 import { useWishlist } from "../common/hooks/useWishlist";
@@ -7,9 +7,10 @@ import Loading from "../common/components/Loading";
 import BackToHome from "../common/components/BackToHome";
 import Error from "../common/components/Error";
 import NotFound from "./NotFound";
+import { TMDBMovie } from "../../types/interfaces";
 
-export default function MovieDetail() {
-  const { id } = useParams();
+const MovieDetail: FC = () => {
+  const { id } = useParams<{ id: string }>();
   const { movie, loading, error } = useMovieDetail(Number(id));
   const { add, remove, has } = useWishlist();
 
@@ -32,7 +33,7 @@ export default function MovieDetail() {
         vote_average: movie.vote_average,
         release_date: movie.release_date,
         addedAt: new Date().toISOString(),
-      });
+      } as TMDBMovie);
     }
   };
 
@@ -42,7 +43,7 @@ export default function MovieDetail() {
 
       <div className="detail__banner">
         <img
-          src={IMG.backdrop(movie.backdrop_path, "w1280")}
+          src={IMG.backdrop(movie.backdrop_path ?? null, "w1280")}
           alt={movie.title}
         />
       </div>
@@ -50,7 +51,7 @@ export default function MovieDetail() {
       <div className="detail__content">
         <img
           className="detail__poster"
-          src={IMG.poster(movie.poster_path, "w342")}
+          src={IMG.poster(movie.poster_path ?? null, "w342")}
           alt={movie.title}
         />
         <div className="detail__meta">
@@ -72,11 +73,13 @@ export default function MovieDetail() {
           </div>
 
           <div className="detail__info">
-            <span>Rating: {movie.vote_average.toFixed(1)}</span>
+            <span>Rating: {movie.vote_average?.toFixed(1)}</span>
             <span>Release: {movie.release_date}</span>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default MovieDetail;

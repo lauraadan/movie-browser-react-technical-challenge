@@ -1,15 +1,10 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Link } from "react-router-dom";
-import { TMDBMovie, IMG } from "../service/api";
+import { IMG } from "../service/api";
+import { CarouselProps } from "../../types/interfaces";
 
-type Props = {
-  title: string;
-  category: string;
-  items: TMDBMovie[];
-};
-
-export default function Carousel({ title, category, items }: Props) {
-  const ref = React.useRef<HTMLDivElement>(null);
+export default function Carousel({ title, category, items }: CarouselProps) {
+  const ref = useRef<HTMLDivElement>(null);
 
   const scrollBy = (dx: number) =>
     ref.current?.scrollBy({ left: dx, behavior: "smooth" });
@@ -30,7 +25,7 @@ export default function Carousel({ title, category, items }: Props) {
             >
               <img
                 loading="lazy"
-                src={IMG.poster(m.poster_path, "w342")}
+                src={IMG.poster(m.poster_path ?? null, "w342")}
                 alt={m.title}
               />
               <div className="movie__overlay">

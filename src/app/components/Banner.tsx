@@ -1,28 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IMG } from "../service/api";
-import { TMDBMovie } from "../../types/interfaces";
+import { TMDBMovie, BannerProps } from "../../types/interfaces";
 import { Link } from "react-router-dom";
 
-type Props = {
-  items: TMDBMovie[];
-  category: string;
-};
-
-export default function Banner({ items, category }: Props) {
-  const [currentIndex, setCurrentIndex] = React.useState(0);
+export default function Banner({ items, category }: BannerProps) {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const length = items.length;
 
-  // Auto-scroll
-  React.useEffect(() => {
+  // Auto-scroll every 5 seconds
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % length);
     }, 5000);
     return () => clearInterval(interval);
   }, [length]);
 
-  if (!items || items.length === 0) return null;
+  if (!items.length) return null;
 
-  const currentMovie = items[currentIndex];
+  const currentMovie: TMDBMovie = items[currentIndex];
 
   return (
     <Link
@@ -30,12 +25,12 @@ export default function Banner({ items, category }: Props) {
       className="hero__carousel-item"
     >
       <img
-        src={IMG.backdrop(currentMovie.backdrop_path, "w780")}
+        src={IMG.backdrop(currentMovie.backdrop_path ?? null, "w780")}
         alt={currentMovie.title}
       />
       <div className="hero__text">
         <h1>{currentMovie.title}</h1>
-        <p>{currentMovie.overview}</p>
+        <p>{currentMovie.overview ?? ""}</p>
       </div>
     </Link>
   );

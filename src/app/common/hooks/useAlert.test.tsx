@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
-import { Ctx, AlertCtx } from "../context/alertContext";
+import { Ctx } from "../context/alertContext";
 import { useAlert } from "./useAlert";
+import { AlertCtx } from "../../../types/interfaces";
 
 describe("useAlert hook", () => {
   it("returns context value when used within provider", () => {

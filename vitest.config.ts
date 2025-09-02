@@ -15,7 +15,7 @@ export default defineConfig({
         "node_modules",
         "tests/**/*",
         "vite.config.ts",
-        "src/interfaces/",
+        "src/types/interfaces.ts",
       ],
     },
   },

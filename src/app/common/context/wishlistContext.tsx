@@ -1,30 +1,26 @@
-import React from "react";
+import React, { ReactNode, useEffect, useState, useCallback } from "react";
 import {
-  TMDBMovie,
   readWishlistIds,
   writeWishlistIds,
   loadMoviesByIds,
 } from "../../service/api";
-
-export type WishlistCtx = {
-  list: TMDBMovie[];
-  add: (movie: TMDBMovie) => void;
-  remove: (id: number) => void;
-  has: (id: number) => boolean;
-};
+import { TMDBMovie, WishlistCtx } from "../../../types/interfaces";
 
 export const Ctx = React.createContext<WishlistCtx | null>(null);
+
+// Props interface
+interface WishlistProviderProps {
+  children: ReactNode;
+  initial?: TMDBMovie[];
+}
 
 export const WishlistProvider = ({
   children,
   initial,
-}: {
-  children: React.ReactNode;
-  initial?: TMDBMovie[];
-}) => {
-  const [list, setList] = React.useState<TMDBMovie[]>(initial || []);
+}: WishlistProviderProps): JSX.Element => {
+  const [list, setList] = useState<TMDBMovie[]>(initial || []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (list.length === 0 && typeof window !== "undefined") {
       const ids = readWishlistIds();
       if (ids.length > 0) {
@@ -33,7 +29,7 @@ export const WishlistProvider = ({
     }
   }, []);
 
-  const syncIds = React.useCallback((movies: TMDBMovie[]) => {
+  const syncIds = useCallback((movies: TMDBMovie[]) => {
     const ids = movies.map((m) => m.id);
     writeWishlistIds(ids);
   }, []);

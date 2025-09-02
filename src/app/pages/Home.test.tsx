@@ -1,74 +1,76 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import Home from "../pages/Home";
+import { describe, it, vi, beforeEach, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import Home from "./Home";
+import { useMovies } from "../common/hooks/useMovies";
 
-vi.mock("../common/hooks/useInitialData", () => ({
-  useInitialData: vi.fn(),
-}));
-
-vi.mock("../service/api", () => ({
-  fetchCategory: vi.fn(),
+vi.mock("../components/Banner", () => ({
+  default: ({ items, category }: any) => (
+    <div data-testid={`banner-${category}`}>{items.length}</div>
+  ),
 }));
 
 vi.mock("../components/Carousel", () => ({
-  default: ({ title }: { title: string }) => <div data-testid="carousel">{title}</div>,
-}));
-
-vi.mock("../components/Banner", () => ({
-  default: ({ items }: { items: any[] }) => (
-    <div data-testid="banner">{items.map((i) => i.title).join(",")}</div>
+  default: ({ title, items }: any) => (
+    <div data-testid={`carousel-${title}`}>{items.length}</div>
   ),
 }));
 
 vi.mock("../common/components/Loading", () => ({
-  default: () => <div data-testid="loading">Loading...</div>,
+  default: () => <div data-testid="loading" />,
 }));
 
-import { useInitialData } from "../common/hooks/useInitialData";
-import { fetchCategory } from "../service/api";
+vi.mock("../common/components/Error", () => ({
+  default: () => <div data-testid="error" />,
+}));
+
+vi.mock("../common/hooks/useMovies", () => ({
+  useMovies: vi.fn(),
+}));
+
+const mockMovies = [
+  { id: 1, title: "Movie 1" },
+  { id: 2, title: "Movie 2" },
+];
 
 describe("Home component", () => {
-  const mockData = {
-    popular: [{ id: 1, title: "Movie 1" }],
-    top_rated: [{ id: 2, title: "Movie 2" }],
-    now_playing: [{ id: 3, title: "Movie 3" }],
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("renders Loading when data is not available", () => {
-    (useInitialData as any).mockReturnValue({ categories: null });
+  it("renders Loading while any hook is loading", () => {
+    (useMovies as any).mockImplementation((category: string) => ({
+      movies: [],
+      loading: true,
+      error: null,
+    }));
+
     render(<Home />);
-    expect(screen.getByTestId("loading")).toBeInTheDocument();
+    expect(screen.getByTestId("loading")).toBeDefined();
   });
 
-it("renders Banner and Carousels when initial data exists", async () => {
-  (useInitialData as any).mockReturnValue({ categories: mockData });
-  render(<Home />);
+  it("renders Error if any hook has error", () => {
+    (useMovies as any).mockImplementation((category: string) => ({
+      movies: [],
+      loading: false,
+      error: category === "top_rated" ? "Error" : null,
+    }));
 
-  expect(screen.getByTestId("banner")).toBeInTheDocument();
+    render(<Home />);
+    expect(screen.getByTestId("error")).toBeDefined();
+  });
 
-  const carousels = screen.getAllByTestId("carousel");
-  expect(carousels).toHaveLength(3);
-  expect(carousels[0]).toHaveTextContent("Popular");
-  expect(carousels[1]).toHaveTextContent("Top Rated");
-  expect(carousels[2]).toHaveTextContent("Now Playing");
-});
-
-  it("fetches data if initial data is null and renders components", async () => {
-    (useInitialData as any).mockReturnValue({ categories: null });
-    (fetchCategory as any)
-      .mockResolvedValueOnce(mockData.popular)
-      .mockResolvedValueOnce(mockData.top_rated)
-      .mockResolvedValueOnce(mockData.now_playing);
+  it("renders Banner and Carousels when movies are loaded", () => {
+    (useMovies as any).mockImplementation((category: string) => ({
+      movies: mockMovies,
+      loading: false,
+      error: null,
+    }));
 
     render(<Home />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId("banner")).toBeInTheDocument();
-      expect(screen.getAllByTestId("carousel")).toHaveLength(3);
-    });
+    expect(screen.getByTestId("banner-popular")).toHaveTextContent("2");
+    expect(screen.getByTestId("carousel-Popular")).toHaveTextContent("2");
+    expect(screen.getByTestId("carousel-Top Rated")).toHaveTextContent("2");
+    expect(screen.getByTestId("carousel-Now Playing")).toHaveTextContent("2");
   });
 });

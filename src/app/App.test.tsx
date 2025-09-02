@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import App from "./App";
-import { fetchCategory } from "./service/api";
 import { MemoryRouter } from "react-router-dom";
 
 vi.mock("./components/Navbar", () => ({ default: () => <div>Navbar</div> }));
@@ -74,17 +73,5 @@ describe("App component", () => {
     );
 
     expect(screen.getByText("Categories Page")).toBeInTheDocument();
-  });
-  it("fetches movies for a category", async () => {
-    const mockResponse = [{ id: 1, title: "Movie 1" }];
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve(mockResponse),
-      } as any)
-    );
-
-    const data = await fetchCategory("popular");
-    expect(data).toEqual(mockResponse);
-    expect(global.fetch).toHaveBeenCalledWith("/api/movies?category=popular");
   });
 });

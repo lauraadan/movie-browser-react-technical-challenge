@@ -1,15 +1,17 @@
-import React from "react";
-import { Ctx, WishlistCtx } from "../context/wishlistContext";
+import React, { useContext } from "react";
+import { Ctx } from "../context/wishlistContext";
 import { useAlert } from "./useAlert";
+import { WishlistCtx, TMDBMovie } from "../../../types/interfaces";
 
 export const useWishlist = (): WishlistCtx => {
-  const ctx = React.useContext(Ctx);
-  const { showAlert } = useAlert(); 
+  const ctx = useContext(Ctx);
+  const { showAlert } = useAlert();
+
   if (!ctx) throw new Error("useWishlist must be used within WishlistProvider");
 
-  const addWithAlert = (movie: Parameters<WishlistCtx["add"]>[0]) => {
+  const addWithAlert = (movie: TMDBMovie) => {
     ctx.add(movie);
-    showAlert(`${movie.title} added to wishlist `);
+    showAlert(`${movie.title} added to wishlist`);
   };
 
   const removeWithAlert = (id: number) => {

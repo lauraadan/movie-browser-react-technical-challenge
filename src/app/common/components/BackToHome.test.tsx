@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import "@testing-library/jest-dom/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import BackToHome from "../components/BackToHome";
 import { ROUTES } from "../constants/constants";
@@ -21,7 +20,7 @@ describe("BackToHome component", () => {
     });
 
     render(<BackToHome />);
-    fireEvent.click(screen.getByText(/Back to home/i));
+    fireEvent.click(screen.getByText(/Back/i));
 
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
@@ -33,7 +32,7 @@ describe("BackToHome component", () => {
     });
 
     render(<BackToHome />);
-    fireEvent.click(screen.getByText(/Back to home/i));
+    fireEvent.click(screen.getByText(/Back/i));
 
     expect(mockNavigate).toHaveBeenCalledWith(ROUTES.HOME);
   });
@@ -45,7 +44,7 @@ describe("BackToHome component", () => {
     });
 
     render(<BackToHome />);
-    fireEvent.click(screen.getByText(/Back to home/i));
+    fireEvent.click(screen.getByText(/Back/i));
 
     expect(mockNavigate).toHaveBeenCalledWith(ROUTES.HOME);
   });

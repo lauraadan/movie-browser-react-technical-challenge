@@ -1,17 +1,18 @@
-import React from "react";
+import React, { FC } from "react";
 import Carousel from "../components/Carousel";
 import Banner from "../components/Banner";
 import Loading from "../common/components/Loading";
 import { useMovies } from "../common/hooks/useMovies";
 import Error from "../common/components/Error";
 
-// TODO GESTIONAR MEDIA QUERIES
-// TODO Hover en botones
+// GESTIONAR MEDIA QUERIES
+// BOTONES HOVER
 
-export default function Home() {
+const Home: FC = () => {
   const popular = useMovies("popular");
   const topRated = useMovies("top_rated");
   const nowPlaying = useMovies("now_playing");
+
   const loading = popular.loading || topRated.loading || nowPlaying.loading;
   const error = popular.error || topRated.error || nowPlaying.error;
 
@@ -37,4 +38,6 @@ export default function Home() {
       />
     </>
   );
-}
+};
+
+export default Home;

@@ -1,9 +1,9 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, FC } from "react";
 
-type Props = {
+interface LayoutProps {
   children: ReactNode;
-};
+}
 
-export const Layout = ({ children }: Props) => {
+export const Layout: FC<LayoutProps> = ({ children }) => {
   return <div className="page">{children}</div>;
 };

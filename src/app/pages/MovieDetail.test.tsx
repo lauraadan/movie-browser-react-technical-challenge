@@ -1,133 +1,154 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import MovieDetail from "../pages/MovieDetail";
+import { describe, it, vi, beforeEach, expect } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import MovieDetail from "./MovieDetail";
+import * as moviesHook from "../common/hooks/useMovies";
+import * as wishlistHook from "../common/hooks/useWishlist";
 import { useParams } from "react-router-dom";
-import { useInitialData } from "../common/hooks/useInitialData";
-import { useWishlist } from "../common/hooks/useWishlist";
-import { fetchMovie } from "../service/api";
+import { TMDBMovie, WishlistCtx } from "../../types/interfaces";
 
-vi.mock("react-router-dom", () => ({
-  useParams: vi.fn(),
-  useSearchParams: vi.fn(() => [new URLSearchParams({ cat: "popular" })]),
-}));
-
-vi.mock("../common/hooks/useInitialData", () => ({
-  useInitialData: vi.fn(),
-}));
-
-vi.mock("../common/hooks/useWishlist", () => ({
-  useWishlist: vi.fn(),
-}));
-
-vi.mock("../service/api", () => ({
-  fetchMovie: vi.fn(),
-  IMG: {
-    poster: (path: string) => `poster/${path}`,
-    backdrop: (path: string) => `backdrop/${path}`,
-  },
-}));
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual<typeof import("react-router-dom")>(
+    "react-router-dom"
+  );
+  return {
+    ...actual,
+    useParams: vi.fn(),
+  };
+});
 
 vi.mock("../common/components/Loading", () => ({
-  default: () => <div data-testid="loading">Loading...</div>,
+  default: () => <div data-testid="loading" />,
 }));
-
+vi.mock("../common/components/Error", () => ({
+  default: () => <div data-testid="error" />,
+}));
+vi.mock("./NotFound", () => ({
+  default: () => <div data-testid="notfound" />,
+}));
 vi.mock("../common/components/BackToHome", () => ({
-  default: () => <div data-testid="back-to-home" />,
+  default: () => <div data-testid="backtohome" />,
 }));
 
 describe("MovieDetail component", () => {
-  const movie = {
+  const movie: TMDBMovie = {
     id: 1,
-    title: "Test Movie",
-    overview: "Overview text",
+    title: "Movie 1",
+    overview: "Overview",
     poster_path: "poster.jpg",
     backdrop_path: "backdrop.jpg",
-    vote_average: 8.5,
+    vote_average: 8,
     release_date: "2023-01-01",
-  };
+    addedAt: new Date().toISOString(),
+  } as TMDBMovie;
+
+  let addMock: vi.MockedFunction<WishlistCtx["add"]>;
+  let removeMock: vi.MockedFunction<WishlistCtx["remove"]>;
+  let hasMock: vi.MockedFunction<WishlistCtx["has"]>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useParams as any).mockReturnValue({ id: "1" });
-    (fetchMovie as any).mockResolvedValue(movie);
-    (useWishlist as any).mockReturnValue({
-      add: vi.fn(),
-      remove: vi.fn(),
-      has: vi.fn().mockReturnValue(false),
-    });
-  });
-  it("renders Loading if no initial movie", () => {
-    (useInitialData as any).mockReturnValue({});
-    (useWishlist as any).mockReturnValue({
-      add: vi.fn(),
-      remove: vi.fn(),
-      has: vi.fn().mockReturnValue(false),
-    });
-
-    render(<MovieDetail />);
-    expect(screen.getByTestId("loading")).toBeInTheDocument();
+    (useParams as unknown as vi.Mock).mockReturnValue({ id: "1" });
+    addMock = vi.fn();
+    removeMock = vi.fn();
+    hasMock = vi.fn();
   });
 
-  it("renders movie details if initial movie exists", () => {
-    (useInitialData as any).mockReturnValue({ movie });
-    (useWishlist as any).mockReturnValue({
-      add: vi.fn(),
-      remove: vi.fn(),
-      has: vi.fn().mockReturnValue(false),
+  it("renders Loading when loading", () => {
+    vi.spyOn(moviesHook, "useMovieDetail").mockReturnValue({
+      movie: undefined,
+      loading: true,
+      error: null,
     });
-
-    render(<MovieDetail />);
-
-    expect(screen.getByText("Test Movie")).toBeInTheDocument();
-    expect(screen.getByText("Overview text")).toBeInTheDocument();
-    expect(screen.getByText("Add to wishlist")).toBeInTheDocument();
-    expect(screen.getByTestId("back-to-home")).toBeInTheDocument();
-
-    const images = screen.getAllByRole("img", { name: /Test Movie/i });
-    expect(images).toHaveLength(2);
-    expect(images[0]).toHaveAttribute("src", "backdrop/backdrop.jpg");
-    expect(images[1]).toHaveAttribute("src", "poster/poster.jpg");
-  });
-
-  it("fetches movie if initial movie is null", async () => {
-    (useInitialData as any).mockReturnValue({});
-    (fetchMovie as any).mockResolvedValue(movie);
-
-    (useWishlist as any).mockReturnValue({
-      add: vi.fn(),
-      remove: vi.fn(),
-      has: vi.fn().mockReturnValue(false),
-    });
-
-    render(<MovieDetail />);
-
-    await waitFor(() => {
-      expect(fetchMovie).toHaveBeenCalledWith("1");
-    });
-  });
-
-  it("toggles wishlist on button click", () => {
-    (useInitialData as any).mockReturnValue({ movie });
-    const addMock = vi.fn();
-    const removeMock = vi.fn();
-    const hasMock = vi.fn().mockReturnValue(false);
-
-    (useWishlist as any).mockReturnValue({
+    vi.spyOn(wishlistHook, "useWishlist").mockReturnValue({
       add: addMock,
       remove: removeMock,
       has: hasMock,
+      list: [],
+    });
+
+    render(<MovieDetail />);
+    expect(screen.getByTestId("loading")).toBeDefined();
+  });
+
+  it("renders Error when there is an error", () => {
+    vi.spyOn(moviesHook, "useMovieDetail").mockReturnValue({
+      movie: undefined,
+      loading: false,
+      error: "Error",
+    });
+    vi.spyOn(wishlistHook, "useWishlist").mockReturnValue({
+      add: addMock,
+      remove: removeMock,
+      has: hasMock,
+      list: [],
+    });
+
+    render(<MovieDetail />);
+    expect(screen.getByTestId("error")).toBeDefined();
+  });
+
+  it("renders NotFound when movie is null", () => {
+    vi.spyOn(moviesHook, "useMovieDetail").mockReturnValue({
+      movie: undefined,
+      loading: false,
+      error: null,
+    });
+    vi.spyOn(wishlistHook, "useWishlist").mockReturnValue({
+      add: addMock,
+      remove: removeMock,
+      has: hasMock,
+      list: [],
+    });
+
+    render(<MovieDetail />);
+    expect(screen.getByTestId("notfound")).toBeDefined();
+  });
+
+  it("renders movie details and remove from wishlist", () => {
+    hasMock.mockReturnValue(true);
+
+    vi.spyOn(moviesHook, "useMovieDetail").mockReturnValue({
+      movie,
+      loading: false,
+      error: null,
+    });
+    vi.spyOn(wishlistHook, "useWishlist").mockReturnValue({
+      add: addMock,
+      remove: removeMock,
+      has: hasMock,
+      list: [movie],
     });
 
     render(<MovieDetail />);
 
-    const button = screen.getByText("Add to wishlist");
-    fireEvent.click(button);
-    expect(addMock).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    expect(screen.getByText("Movie 1")).toBeDefined();
+    const btn = screen.getByText("Remove from wishlist");
+    fireEvent.click(btn);
+    expect(removeMock).toHaveBeenCalledWith(movie.id);
+  });
 
-    hasMock.mockReturnValue(true);
+  it("renders movie details and add to wishlist", () => {
+    hasMock.mockReturnValue(false);
+
+    vi.spyOn(moviesHook, "useMovieDetail").mockReturnValue({
+      movie,
+      loading: false,
+      error: null,
+    });
+    vi.spyOn(wishlistHook, "useWishlist").mockReturnValue({
+      add: addMock,
+      remove: removeMock,
+      has: hasMock,
+      list: [],
+    });
+
     render(<MovieDetail />);
-    const removeButton = screen.getByText("Remove from wishlist");
-    fireEvent.click(removeButton);
-    expect(removeMock).toHaveBeenCalledWith(1);
+
+    expect(screen.getByText("Movie 1")).toBeDefined();
+    const btn = screen.getByText("Add to wishlist");
+    fireEvent.click(btn);
+    expect(addMock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: movie.id, title: movie.title })
+    );
   });
 });

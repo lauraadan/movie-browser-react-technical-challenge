@@ -1,91 +1,128 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import Categories from "../pages/Categories";
+import { render, screen } from "@testing-library/react";
+import { describe, it, vi, beforeEach, expect } from "vitest";
+import Categories from "./Categories";
+import { TMDBMovie, GenreWithMovies } from "../../types/interfaces";
 
-
-vi.mock("axios", () => ({
-  default: {
-    get: vi.fn(),
-  },
-}));
-
-vi.mock("../components/Carousel", () => ({
-  default: ({ title }: any) => <div data-testid="carousel">{title}</div>,
+vi.mock("../common/hooks/useMovies", () => ({
+  useMovies: vi.fn(),
+  useMovieGenres: vi.fn(),
 }));
 
 vi.mock("../common/components/Loading", () => ({
-  default: () => <div data-testid="loading">Loading...</div>,
+  default: () => <div>LoadingComponentMock</div>,
+}));
+vi.mock("../common/components/Error", () => ({
+  default: () => <div>ErrorComponentMock</div>,
+}));
+vi.mock("../components/Banner", () => ({
+  default: ({ items }: { items: TMDBMovie[] }) => (
+    <div>BannerMock-{items.length}</div>
+  ),
+}));
+vi.mock("../components/Carousel", () => ({
+  default: ({ title }: { title: string }) => <div>CarouselMock-{title}</div>,
 }));
 
-import axios from "axios";
+import { useMovies, useMovieGenres } from "../common/hooks/useMovies";
+
+const mockedUseMovies = useMovies as unknown as vi.Mock;
+const mockedUseMovieGenres = useMovieGenres as unknown as vi.Mock;
 
 describe("Categories component", () => {
-  const genres = [
-    { id: 1, name: "Action" },
-    { id: 2, name: "Comedy" },
-  ];
-
-  const movies = [
-    { id: 101, title: "Movie 1" },
-    { id: 102, title: "Movie 2" },
-  ];
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("shows loading initially", () => {
-    render(<Categories />);
-    expect(screen.getByTestId("loading")).toBeInTheDocument();
-  });
-
-  it("renders carousels after fetching genres and movies", async () => {
-    (axios.get as any)
-      .mockImplementationOnce(() =>
-        Promise.resolve({ data: { genres } })
-      )
-      .mockImplementationOnce(() =>
-        Promise.resolve({ data: { results: movies } })
-      )
-      .mockImplementationOnce(() =>
-        Promise.resolve({ data: { results: movies } })
-      );
-
-    render(<Categories />);
-
-    await waitFor(() => {
-      expect(screen.queryByTestId("loading")).not.toBeInTheDocument();
+  it("shows Loading when loading", () => {
+    mockedUseMovieGenres.mockReturnValue({
+      genres: [] as GenreWithMovies[],
+      loading: true,
+      error: null,
+    });
+    mockedUseMovies.mockReturnValue({
+      movies: [] as TMDBMovie[],
+      loading: false,
+      error: null,
     });
 
-    const carousels = screen.getAllByTestId("carousel");
-    expect(carousels).toHaveLength(2); 
-    expect(carousels[0]).toHaveTextContent("Action");
-    expect(carousels[1]).toHaveTextContent("Comedy");
+    render(<Categories />);
+    expect(screen.getByText("LoadingComponentMock")).toBeInTheDocument();
   });
 
-  it("filters out genres with no movies", async () => {
-    const genresWithEmpty = [
-      { id: 1, name: "Action" },
-      { id: 2, name: "Empty" },
+  it("shows Error when there is an error", () => {
+    mockedUseMovieGenres.mockReturnValue({
+      genres: [] as GenreWithMovies[],
+      loading: false,
+      error: "Error",
+    });
+    mockedUseMovies.mockReturnValue({
+      movies: [] as TMDBMovie[],
+      loading: false,
+      error: null,
+    });
+
+    render(<Categories />);
+    expect(screen.getByText("ErrorComponentMock")).toBeInTheDocument();
+  });
+
+  it("shows message if no movies by genre", () => {
+    mockedUseMovieGenres.mockReturnValue({
+      genres: [] as GenreWithMovies[],
+      loading: false,
+      error: null,
+    });
+    mockedUseMovies.mockReturnValue({
+      movies: [
+        { id: 1, title: "M1" } as TMDBMovie,
+        { id: 2, title: "M2" } as TMDBMovie,
+      ],
+      loading: false,
+      error: null,
+    });
+
+    render(<Categories />);
+    expect(screen.getByText("No movies found for genres.")).toBeInTheDocument();
+    expect(screen.getByText("BannerMock-2")).toBeInTheDocument();
+  });
+
+  it("renders Banner and Carousels with movies by genre", () => {
+    const genres: GenreWithMovies[] = [
+      {
+        id: 1,
+        name: "Action",
+        movies: [{ id: 101, title: "Action1" } as TMDBMovie],
+      },
+      {
+        id: 2,
+        name: "Comedy",
+        movies: [
+          { id: 201, title: "Comedy1" } as TMDBMovie,
+          { id: 202, title: "Comedy2" } as TMDBMovie,
+        ],
+      },
     ];
-
-    (axios.get as any)
-      .mockImplementationOnce(() =>
-        Promise.resolve({ data: { genres: genresWithEmpty } })
-      )
-      .mockImplementationOnce(() =>
-        Promise.resolve({ data: { results: movies } })
-      )
-      .mockImplementationOnce(() =>
-        Promise.resolve({ data: { results: [] } }) 
-      );
+    mockedUseMovieGenres.mockReturnValue({
+      genres,
+      loading: false,
+      error: null,
+    });
+    mockedUseMovies.mockReturnValue({
+      movies: [
+        { id: 1, title: "M1" } as TMDBMovie,
+        { id: 2, title: "M2" } as TMDBMovie,
+        { id: 3, title: "M3" } as TMDBMovie,
+        { id: 4, title: "M4" } as TMDBMovie,
+        { id: 5, title: "M5" } as TMDBMovie,
+      ],
+      loading: false,
+      error: null,
+    });
 
     render(<Categories />);
 
-    await waitFor(() => {
-      const carousels = screen.getAllByTestId("carousel");
-      expect(carousels).toHaveLength(1);
-      expect(carousels[0]).toHaveTextContent("Action");
-    });
+    expect(screen.getByText("BannerMock-5")).toBeInTheDocument();
+    expect(screen.getByText("Categories")).toBeInTheDocument();
+    expect(screen.getByText("CarouselMock-Action")).toBeInTheDocument();
+    expect(screen.getByText("CarouselMock-Comedy")).toBeInTheDocument();
   });
 });

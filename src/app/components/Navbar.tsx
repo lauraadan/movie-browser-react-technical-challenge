@@ -1,12 +1,13 @@
+import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { ROUTES } from "../common/constants/constants";
-import logo from "../../assets/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg";
-export default function Navbar() {
+
+export default function Navbar(): JSX.Element {
   return (
     <header className="navbar">
       <div className="navbar__inner">
         <Link to={ROUTES.HOME} className="navbar__logo">
-          <img src={logo} alt="logo" />
+          <img src="src/assets/logo.svg" alt="logo" />
         </Link>
         <nav className="navbar__nav">
           <NavLink
@@ -19,7 +20,7 @@ export default function Navbar() {
             Home
           </NavLink>
           <NavLink
-            to="/categories"
+            to={ROUTES.CATEGORIES}
             className={({ isActive }) =>
               "nav__link" + (isActive ? " is-active" : "")
             }
@@ -27,7 +28,7 @@ export default function Navbar() {
             Categories
           </NavLink>
           <NavLink
-            to="/wishlist"
+            to={ROUTES.WISHLIST}
             className={({ isActive }) =>
               "nav__link" + (isActive ? " is-active" : "")
             }

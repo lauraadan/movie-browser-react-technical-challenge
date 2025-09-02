@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Wishlist from "../pages/Wishlist";
+import { useInitialData } from "../common/hooks/useInitialData";
+import { useWishlist } from "../common/hooks/useWishlist";
 
 vi.mock("../common/hooks/useInitialData", () => ({
   useInitialData: vi.fn(),
@@ -19,9 +21,6 @@ vi.mock("../service/api", () => ({
 vi.mock("../common/components/Loading", () => ({
   default: () => <div data-testid="loading">Loading...</div>,
 }));
-
-import { useInitialData } from "../common/hooks/useInitialData";
-import { useWishlist } from "../common/hooks/useWishlist";
 
 describe("Wishlist component", () => {
   const mockList = [
@@ -52,7 +51,10 @@ describe("Wishlist component", () => {
   it("renders wishlist items from hook list", () => {
     const removeMock = vi.fn();
     (useInitialData as any).mockReturnValue({ wishlist: [] });
-    (useWishlist as any).mockReturnValue({ list: mockList, remove: removeMock });
+    (useWishlist as any).mockReturnValue({
+      list: mockList,
+      remove: removeMock,
+    });
 
     render(<Wishlist />);
 

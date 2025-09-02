@@ -1,5 +1,6 @@
 import React from "react";
-import { Ctx, AlertCtx } from "../context/alertContext";
+import { Ctx } from "../context/alertContext";
+import { AlertCtx } from "../../../types/interfaces";
 
 export const useAlert = (): AlertCtx => {
   const ctx = React.useContext(Ctx);

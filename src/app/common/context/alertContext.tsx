@@ -1,14 +1,16 @@
-import React from "react";
-
-export type AlertCtx = {
-  message: string | null;
-  showAlert: (msg: string) => void;
-};
+import React, { ReactNode, useState } from "react";
+import { AlertCtx } from "../../../types/interfaces";
 
 export const Ctx = React.createContext<AlertCtx | null>(null);
 
-export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
-  const [message, setMessage] = React.useState<string | null>(null);
+interface AlertProviderProps {
+  children: ReactNode;
+}
+
+export const AlertProvider = ({
+  children,
+}: AlertProviderProps): JSX.Element => {
+  const [message, setMessage] = useState<string | null>(null);
 
   const showAlert = (msg: string) => {
     setMessage(msg);

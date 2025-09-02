@@ -1,25 +1,30 @@
-import { describe, it, expect, vi } from "vitest";
-import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import Alert from "./Alert";
-
-vi.mock("../hooks/useAlert", () => ({
-  useAlert: vi.fn(),
-}));
-
 import { useAlert } from "../hooks/useAlert";
 
+vi.mock("../hooks/useAlert");
+
+const mockedUseAlert = useAlert as unknown as vi.Mock;
+
 describe("Alert component", () => {
-  it("renders nothing when there is no message", () => {
-    (useAlert as any).mockReturnValue({ message: "" });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("renders nothing if there is no message", () => {
+    mockedUseAlert.mockReturnValue({ message: "" });
+
     const { container } = render(<Alert />);
     expect(container.firstChild).toBeNull();
   });
 
-  it("renders the message when message exists", () => {
-    const testMessage = "Test alert message";
-    (useAlert as any).mockReturnValue({ message: testMessage });
+  it("display the message if it exists", () => {
+    const testMessage = "This is an alert message";
+    mockedUseAlert.mockReturnValue({ message: testMessage });
+
     render(<Alert />);
     expect(screen.getByText(testMessage)).toBeInTheDocument();
+    expect(screen.getByText(testMessage).className).toContain("alert");
   });
 });

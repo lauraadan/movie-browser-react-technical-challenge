@@ -1,39 +1,108 @@
-import { render, waitFor } from "@testing-library/react";
 import React from "react";
-import { vi, expect, it } from "vitest";
+import { render, act, renderHook } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { WishlistProvider, Ctx } from "./wishlistContext";
-import { readWishlistIds, loadMoviesByIds } from "../../service/api";
+import { TMDBMovie, WishlistCtx } from "../../../types/interfaces";
+import * as api from "../../service/api";
 
 vi.mock("../../service/api", () => ({
   readWishlistIds: vi.fn(),
-  loadMoviesByIds: vi.fn(),
   writeWishlistIds: vi.fn(),
+  loadMoviesByIds: vi.fn(),
 }));
 
-it("loads movies from readWishlistIds if initial list is empty", async () => {
-  const movie1 = { id: 1, title: "Movie 1" };
-  const movie2 = { id: 2, title: "Movie 2" };
+describe("WishlistProvider", () => {
+  const movie1: TMDBMovie = { id: 1, title: "Movie 1" } as any;
+  const movie2: TMDBMovie = { id: 2, title: "Movie 2" } as any;
 
-  // @ts-ignore
-  readWishlistIds.mockReturnValue([1, 2]);
-  // @ts-ignore
-  loadMoviesByIds.mockResolvedValue([movie1, movie2]);
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-  let contextValue: any = null;
+  it("provides initial list", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <WishlistProvider initial={[movie1]}>{children}</WishlistProvider>
+    );
+    const { result } = renderHook(() => React.useContext(Ctx) as WishlistCtx, {
+      wrapper,
+    });
+    expect(result.current.list).toEqual([movie1]);
+  });
 
-  const TestComponent = () => {
-    contextValue = React.useContext(Ctx);
-    return null;
-  };
+  it("loads movies from API if no initial list", async () => {
+    (api.readWishlistIds as vi.Mock).mockReturnValue([1, 2]);
+    (api.loadMoviesByIds as vi.Mock).mockResolvedValue([movie1, movie2]);
 
-  render(
-    <WishlistProvider>
-      <TestComponent />
-    </WishlistProvider>
-  );
+    await act(async () => {
+      render(
+        <WishlistProvider>
+          <Ctx.Consumer>
+            {(ctx) => <span>{ctx?.list.length}</span>}
+          </Ctx.Consumer>
+        </WishlistProvider>
+      );
+    });
 
-  await waitFor(() => expect(contextValue.list.length).toBe(2));
+    expect(api.readWishlistIds).toHaveBeenCalled();
+    expect(api.loadMoviesByIds).toHaveBeenCalledWith([1, 2]);
+  });
 
-  expect(loadMoviesByIds).toHaveBeenCalledWith([1, 2]);
-  expect(contextValue.list).toEqual([movie1, movie2]);
+  it("add adds a movie if not in list", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <WishlistProvider initial={[movie1]}>{children}</WishlistProvider>
+    );
+    const { result } = renderHook(() => React.useContext(Ctx) as WishlistCtx, {
+      wrapper,
+    });
+
+    act(() => {
+      result.current.add(movie2);
+    });
+
+    expect(result.current.list).toContain(movie2);
+    expect(api.writeWishlistIds).toHaveBeenCalledWith([1, 2]);
+  });
+
+  it("add does not add duplicate", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <WishlistProvider initial={[movie1]}>{children}</WishlistProvider>
+    );
+    const { result } = renderHook(() => React.useContext(Ctx) as WishlistCtx, {
+      wrapper,
+    });
+
+    act(() => {
+      result.current.add(movie1);
+    });
+
+    expect(result.current.list).toHaveLength(1);
+  });
+
+  it("remove removes a movie", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <WishlistProvider initial={[movie1, movie2]}>{children}</WishlistProvider>
+    );
+    const { result } = renderHook(() => React.useContext(Ctx) as WishlistCtx, {
+      wrapper,
+    });
+
+    act(() => {
+      result.current.remove(1);
+    });
+
+    expect(result.current.list).toEqual([movie2]);
+    expect(api.writeWishlistIds).toHaveBeenCalledWith([2]);
+  });
+
+  it("has returns true if movie exists, false otherwise", () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <WishlistProvider initial={[movie1]}>{children}</WishlistProvider>
+    );
+    const { result } = renderHook(() => React.useContext(Ctx) as WishlistCtx, {
+      wrapper,
+    });
+
+    expect(result.current.has(1)).toBe(true);
+    expect(result.current.has(999)).toBe(false);
+  });
 });

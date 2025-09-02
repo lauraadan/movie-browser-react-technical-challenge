@@ -1,10 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { useFetchData } from "../../../types/interfaces";
 
-/**
- *
- * @param fetcher
- * @param deps
- */
 export function useFetchData<T>(fetcher: () => Promise<T>, deps: any[] = []) {
   const [data, setData] = useState<T | undefined>(undefined);
   const [loading, setLoading] = useState(true);

@@ -5,14 +5,18 @@ import {
   fetchMoviesByGenre,
 } from "../../service/api";
 import { mapMovie } from "../../service/mapper/mapper";
-import type { TMDBMovie, GenreWithMovies } from "../../../types/interfaces";
+import type {
+  MovieDetailState,
+  MovieGenresState,
+  MoviesState,
+} from "../../../types/interfaces";
 
 export const useMovies = (category: string) => {
-  const [state, setState] = useState<{
-    movies: TMDBMovie[];
-    loading: boolean;
-    error: string | null;
-  }>({ movies: [], loading: true, error: null });
+  const [state, setState] = useState<MoviesState>({
+    movies: [],
+    loading: true,
+    error: null,
+  });
 
   useEffect(() => {
     setState((s) => ({ ...s, loading: true }));
@@ -20,7 +24,7 @@ export const useMovies = (category: string) => {
       .then((data) =>
         setState({ movies: data.map(mapMovie), loading: false, error: null })
       )
-      .catch((err) =>
+      .catch((err: Error) =>
         setState({ movies: [], loading: false, error: err.message })
       );
   }, [category]);
@@ -29,11 +33,11 @@ export const useMovies = (category: string) => {
 };
 
 export const useMovieDetail = (id?: number) => {
-  const [state, setState] = useState<{
-    movie?: TMDBMovie;
-    loading: boolean;
-    error: string | null;
-  }>({ movie: undefined, loading: true, error: null });
+  const [state, setState] = useState<MovieDetailState>({
+    movie: undefined,
+    loading: true,
+    error: null,
+  });
 
   useEffect(() => {
     if (!id) return;
@@ -42,7 +46,7 @@ export const useMovieDetail = (id?: number) => {
       .then((data) =>
         setState({ movie: mapMovie(data), loading: false, error: null })
       )
-      .catch((err) =>
+      .catch((err: Error) =>
         setState({ movie: undefined, loading: false, error: err.message })
       );
   }, [id]);
@@ -51,11 +55,7 @@ export const useMovieDetail = (id?: number) => {
 };
 
 export const useMovieGenres = () => {
-  const [state, setState] = useState<{
-    genres: GenreWithMovies[];
-    loading: boolean;
-    error: string | null;
-  }>({
+  const [state, setState] = useState<MovieGenresState>({
     genres: [],
     loading: true,
     error: null,
@@ -63,11 +63,10 @@ export const useMovieGenres = () => {
 
   useEffect(() => {
     fetchMoviesByGenre()
-      .then((data) => {
-        console.log("Fetched genres:", data);
-        setState({ genres: data || [], loading: false, error: null });
-      })
-      .catch((err) =>
+      .then((data) =>
+        setState({ genres: data || [], loading: false, error: null })
+      )
+      .catch((err: Error) =>
         setState({ genres: [], loading: false, error: err.message })
       );
   }, []);

@@ -1,57 +1,81 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import "@testing-library/jest-dom/vitest";
-import { render, act } from "@testing-library/react";
-import { Ctx, WishlistCtx } from "../context/wishlistContext";
-import { useWishlist } from "../hooks/useWishlist";
+import { vi } from "vitest";
+import { ReactNode } from "react";
+import { renderHook, act } from "@testing-library/react";
+import { useWishlist } from "./useWishlist";
+import { Ctx } from "../context/wishlistContext";
+import { TMDBMovie, WishlistCtx } from "../../../types/interfaces";
 
-const mockShowAlert = vi.fn();
+const showAlertMock = vi.fn();
+
 vi.mock("./useAlert", () => ({
-  useAlert: () => ({ showAlert: mockShowAlert }),
+  useAlert: () => ({ showAlert: showAlertMock }),
 }));
 
-describe("useWishlist hook - add method", () => {
-  const movie1 = { id: 1, title: "Movie 1" };
-  const movie2 = { id: 2, title: "Movie 2" };
+vi.mock("../../service/api", () => ({
+  fetchCategory: vi.fn(),
+  fetchMovie: vi.fn(),
+}));
+
+describe("useWishlist hook", () => {
+  const movie: TMDBMovie = { id: 1, title: "Test Movie" };
+  let ctxValue: WishlistCtx;
 
   beforeEach(() => {
-    mockShowAlert.mockClear();
-  });
-
-  it("add calls ctx.add and triggers showAlert", () => {
-    const ctxValue: WishlistCtx = {
-      list: [],
+    vi.clearAllMocks();
+    ctxValue = {
+      list: [movie],
       add: vi.fn(),
       remove: vi.fn(),
-      has: vi.fn(),
+      has: vi.fn().mockReturnValue(true),
     };
+  });
 
-    let hookValue: ReturnType<typeof useWishlist> | null = null;
+  it("throws error if used outside WishlistProvider", () => {
+    expect(() => renderHook(() => useWishlist())).toThrow(
+      "useWishlist must be used within WishlistProvider"
+    );
+  });
 
-    const TestComponent = () => {
-      hookValue = useWishlist();
-      return null;
-    };
-
-    render(
-      <Ctx.Provider value={ctxValue}>
-        <TestComponent />
-      </Ctx.Provider>
+  it("add calls ctx.add and showAlert", () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <Ctx.Provider value={ctxValue}>{children}</Ctx.Provider>
     );
 
-    act(() => {
-      hookValue?.add(movie1);
-    });
+    const { result } = renderHook(() => useWishlist(), { wrapper });
 
-    expect(ctxValue.add).toHaveBeenCalledWith(movie1);
-    expect(mockShowAlert).toHaveBeenCalledWith("Movie 1 added to wishlist ");
+    act(() => result.current.add(movie));
 
-    act(() => {
-      hookValue?.add(movie2);
-    });
+    expect(ctxValue.add).toHaveBeenCalledWith(movie);
+    expect(showAlertMock).toHaveBeenCalledWith(
+      `${movie.title} added to wishlist`
+    );
+  });
 
-    expect(ctxValue.add).toHaveBeenCalledWith(movie2);
-    expect(mockShowAlert).toHaveBeenCalledWith("Movie 2 added to wishlist ");
-    expect(ctxValue.add).toHaveBeenCalledTimes(2);
-    expect(mockShowAlert).toHaveBeenCalledTimes(2);
+  it("remove calls ctx.remove and showAlert if movie exists", () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <Ctx.Provider value={ctxValue}>{children}</Ctx.Provider>
+    );
+
+    const { result } = renderHook(() => useWishlist(), { wrapper });
+
+    act(() => result.current.remove(movie.id));
+
+    expect(ctxValue.remove).toHaveBeenCalledWith(movie.id);
+    expect(showAlertMock).toHaveBeenCalledWith(
+      `${movie.title} removed from wishlist`
+    );
+  });
+
+  it("remove calls ctx.remove and does not show alert if movie not found", () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <Ctx.Provider value={{ ...ctxValue, list: [] }}>{children}</Ctx.Provider>
+    );
+
+    const { result } = renderHook(() => useWishlist(), { wrapper });
+
+    act(() => result.current.remove(999));
+
+    expect(ctxValue.remove).toHaveBeenCalledWith(999);
+    expect(showAlertMock).not.toHaveBeenCalled();
   });
 });
