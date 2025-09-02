@@ -21,8 +21,8 @@ export interface TMDBMovie extends TMDBImagePaths {
 
 // movie with genre interface
 export interface Genre {
-  id: number;
-  name: string;
+  genreId: number;
+  genreName: string;
 }
 
 // Movies with genre interface

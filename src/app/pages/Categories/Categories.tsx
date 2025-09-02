@@ -30,9 +30,9 @@ const Categories: FC = () => {
       {genresWithMovies.length > 0 ? (
         genresWithMovies.map((g) => (
           <Carousel
-            key={g.id}
-            title={g.name}
-            category={g.name}
+            key={g.genreId}
+            title={g.genreName}
+            category={g.genreName}
             items={g.movies as TMDBMovie[]}
           />
         ))

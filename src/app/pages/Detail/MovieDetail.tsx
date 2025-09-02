@@ -1,5 +1,5 @@
-import React, { FC } from "react";
-import { useParams } from "react-router-dom";
+import React, { FC, useMemo } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import { IMG } from "../../service/api";
 import { useMovieDetail } from "../../hooks/useMovies/useMovies";
 import { useWishlist } from "../../hooks/useWishlist/useWishlist";
@@ -9,10 +9,33 @@ import Error from "../../components/Error/Error";
 import NotFound from "../NotFound/NotFound";
 import { TMDBMovie } from "../../../types/interfaces";
 
+const normalizeCategory = (str: string) =>
+  str
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-z0-9_]/g, "");
+
+const formatCategoryLabel = (str: string) =>
+  str.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
 const MovieDetail: FC = () => {
   const { id } = useParams<{ id: string }>();
   const { movie, loading, error } = useMovieDetail(Number(id));
   const { add, remove, has } = useWishlist();
+
+  const location = useLocation();
+
+  const { categoryKey, categoryLabel } = useMemo(() => {
+    const searchParams =
+      typeof window !== "undefined"
+        ? new URLSearchParams(location.search)
+        : null;
+    const catRaw = searchParams?.get("cat") || "general";
+    return {
+      categoryKey: normalizeCategory(catRaw),
+      categoryLabel: formatCategoryLabel(catRaw),
+    };
+  }, [location.search]);
 
   if (loading) return <Loading />;
   if (error) return <Error />;
@@ -20,7 +43,9 @@ const MovieDetail: FC = () => {
 
   const isFav = has(movie.id);
 
-  const handleToggle = () => {
+  console.log(categoryKey);
+
+  const handleToggleWishlist = () => {
     if (isFav) {
       remove(movie.id);
     } else {
@@ -38,7 +63,7 @@ const MovieDetail: FC = () => {
   };
 
   return (
-    <div className="detail">
+    <div className={`detail category--${categoryKey}`}>
       <BackToHome />
 
       <div className="detail__banner">
@@ -54,8 +79,10 @@ const MovieDetail: FC = () => {
           src={IMG.poster(movie.poster_path ?? null, "w342")}
           alt={movie.title}
         />
+
         <div className="detail__meta">
           <h1 className="detail__title">{movie.title}</h1>
+          <span className="detail__badge">{categoryLabel}</span>
           <p className="detail__overview">{movie.overview}</p>
 
           <div className="detail__actions">
@@ -65,7 +92,7 @@ const MovieDetail: FC = () => {
                   ? "btn--wishlist-secondary btn"
                   : "btn btn--wishlist-primary"
               }
-              onClick={handleToggle}
+              onClick={handleToggleWishlist}
             >
               <span className="material-symbols-outlined">favorite</span>
               {isFav ? "Remove from wishlist" : "Add to wishlist"}

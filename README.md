@@ -1,6 +1,6 @@
 # Netflix-like Movies (Vite + React + TypeScript + SSR + SCSS)
 
-A handcrafted, server‑side rendered React app bundled with Vite. It lets you browse movies by three categories (Popular, Top Rated, Now Playing), open a detail page with category‑specific styling, and manage a wishlist — all without UI libraries like Material UI, Tailwind, CSS Modules or Styled Components. Styling is done with plain SCSS and the layout evokes Netflix.
+A handcrafted, server‑side rendered React app bundled with Vite. It lets you browse movies by three categories (Popular, Top Rated, Now Playing), open a detail page with category‑specific styling, and manage a wishlist — all without UI libraries like Material UI, Tailwind, CSS Modules or Styled Components. Styling is done with plain SCSS.
 
 > **Stack:** Vite, React 18, TypeScript, Express (for SSR + API proxy), SCSS.  
 > **No full‑stack frameworks** (e.g., Next.js) are used. **No UI libraries** are used.

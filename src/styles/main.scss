@@ -139,22 +139,10 @@
   background: $accent;
   color: white;
 }
-.btn--ghost {
-  background: transparent;
-  color: $text;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-}
 
 .btn--wishlist-primary {
   background: transparent;
   color: $accent;
-  border: 1px solid $accent;
-}
-
-.btn--wishlist-secondary {
-  background: transparent;
-  color: $important;
-  border: 1px solid $important;
 }
 
 /* Carousel */
@@ -171,16 +159,11 @@
   font-weight: 800;
   letter-spacing: 0.3px;
 }
-.carousel__controls {
-  display: flex;
-  gap: 8px;
-}
 
 .carousel__wrapper {
   position: relative;
   display: flex;
   align-items: center;
-
   .carousel__scroller {
     display: flex;
     gap: 12px;
@@ -247,18 +230,20 @@
   }
 }
 
+/* Movie */
 .movie {
   position: relative;
   flex: 0 0 220px;
   border-radius: 12px;
   overflow: hidden;
   background: $bg-elev;
+  img {
+    width: 220px;
+    height: 330px;
+    object-fit: cover;
+  }
 }
-.movie img {
-  width: 220px;
-  height: 330px;
-  object-fit: cover;
-}
+
 .movie__overlay {
   position: absolute;
   inset: 0;
@@ -277,19 +262,18 @@
 }
 
 /* Detail page with category-based font differences */
-.detail.category-popular .detail__title {
+.detail .category--popular .detail__title {
   font-family: $font-cat-popular;
   letter-spacing: 1px;
   font-size: 48px;
 }
-.detail.category-top_rated .detail__title {
+.detail .category--top_rated .detail__title {
   font-family: $font-cat-top_rated;
   text-transform: uppercase;
 }
-.detail.category-now_playing .detail__title {
+.detail .category--now_playing .detail__title {
   font-family: $font-cat-now_playing;
 }
-
 .detail__banner {
   background: radial-gradient(
       1200px 400px at 20% -20%,
@@ -310,7 +294,6 @@
     height: 40vh;
   }
 }
-
 .detail__content {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -377,4 +360,262 @@
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 12px;
+}
+
+/* === Category-aware theming for Movie Detail === */
+/* Import a few display fonts for category-specific titles */
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Merriweather:wght@700&family=Fira+Sans:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&display=swap");
+
+/* Badge element */
+.detail__badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+}
+
+/* Default overrides (General) */
+.detail.category--general .detail__title {
+  font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto,
+    sans-serif;
+}
+.detail.category--general .btn--wishlist-primary {
+  background: #7c4dff;
+  color: #fff;
+}
+.detail.category--general .detail__poster {
+  box-shadow: 0 10px 24px rgba(124, 77, 255, 0.25);
+}
+
+/* Home categories */
+.detail.category--popular .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+  letter-spacing: 0.5px;
+}
+.detail.category--popular .btn--wishlist-primary {
+  background: #e53935;
+  color: #fff;
+}
+.detail.category--popular .detail__banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(229, 57, 53, 0.25),
+    rgba(0, 0, 0, 0.6)
+  );
+  pointer-events: none;
+}
+
+.detail.category--top_rated .detail__title {
+  font-family: "Merriweather", Georgia, "Times New Roman", serif;
+}
+.detail.category--top_rated .btn--wishlist-primary {
+  background: #43a047;
+  color: #fff;
+}
+.detail.category--top_rated .detail__poster {
+  outline: 3px solid rgba(67, 160, 71, 0.35);
+  outline-offset: 4px;
+}
+
+.detail.category--now_playing .detail__title {
+  font-family: "Fira Sans", system-ui, -apple-system, Segoe UI, Roboto,
+    sans-serif;
+}
+.detail.category--now_playing .btn--wishlist-primary {
+  background: #039be5;
+  color: #fff;
+}
+.detail.category--now_playing .detail__banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 155, 229, 0.2),
+    rgba(0, 0, 0, 0.6)
+  );
+  pointer-events: none;
+}
+
+/* Genre-based categories from /categories page (normalize to lowercase & underscores) */
+.detail.category--action .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+}
+.detail.category--action .btn--wishlist-primary {
+  background: #ff7043;
+  color: #fff;
+}
+.detail.category--action .detail__poster {
+  box-shadow: 0 10px 24px rgba(255, 112, 67, 0.35);
+}
+
+.detail.category--adventure .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--adventure .btn--wishlist-primary {
+  background: #26a69a;
+  color: #fff;
+}
+
+.detail.category--animation .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--animation .btn--wishlist-primary {
+  background: #7e57c2;
+  color: #fff;
+}
+
+.detail.category--comedy .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--comedy .btn--wishlist-primary {
+  background: #fdd835;
+  color: #000;
+}
+
+.detail.category--crime .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--crime .btn--wishlist-primary {
+  background: #6d4c41;
+  color: #fff;
+}
+
+.detail.category--documentary .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--documentary .btn--wishlist-primary {
+  background: #00897b;
+  color: #fff;
+}
+
+.detail.category--drama .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--drama .btn--wishlist-primary {
+  background: #8e24aa;
+  color: #fff;
+}
+
+.detail.category--family .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--family .btn--wishlist-primary {
+  background: #ef6c00;
+  color: #fff;
+}
+
+.detail.category--fantasy .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--fantasy .btn--wishlist-primary {
+  background: #5e35b1;
+  color: #fff;
+}
+
+.detail.category--history .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--history .btn--wishlist-primary {
+  background: #bf360c;
+  color: #fff;
+}
+
+.detail.category--horror .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+}
+.detail.category--horror .btn--wishlist-primary {
+  background: #c62828;
+  color: #fff;
+}
+.detail.category--horror .detail__poster {
+  filter: grayscale(25%);
+}
+
+.detail.category--music .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--music .btn--wishlist-primary {
+  background: #3949ab;
+  color: #fff;
+}
+
+.detail.category--mystery .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--mystery .btn--wishlist-primary {
+  background: #546e7a;
+  color: #fff;
+}
+
+.detail.category--romance .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--romance .btn--wishlist-primary {
+  background: #e91e63;
+  color: #fff;
+}
+
+.detail.category--science_fiction .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+  letter-spacing: 0.4px;
+}
+.detail.category--science_fiction .btn--wishlist-primary {
+  background: #00acc1;
+  color: #fff;
+}
+.detail.category--science_fiction .detail__meta {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.detail.category--tv_movie .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--tv_movie .btn--wishlist-primary {
+  background: #8d6e63;
+  color: #fff;
+}
+
+.detail.category--thriller .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+}
+.detail.category--thriller .btn--wishlist-primary {
+  background: #455a64;
+  color: #fff;
+}
+
+.detail.category--war .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--war .btn--wishlist-primary {
+  background: #a1887f;
+  color: #fff;
+}
+
+.detail.category--western .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--western .btn--wishlist-primary {
+  background: #6d4c41;
+  color: #fff;
+}
+
+/* Utility: ensure banner can host a pseudo-element overlay */
+.detail__banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
 }
