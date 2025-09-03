@@ -1,0 +1,621 @@
+@use "./variables" as *;
+
+.page {
+  padding: 40px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.page.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 60vh;
+}
+
+.muted {
+  color: $muted;
+}
+.loading {
+  padding: 48px 0;
+  text-align: center;
+}
+
+/* Navbar */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.2));
+  backdrop-filter: blur(6px);
+  .navbar__inner {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .navbar__logo {
+    font-weight: 800;
+    font-size: 24px;
+    color: $accent;
+    letter-spacing: 1px;
+  }
+  .navbar__nav {
+    display: flex;
+    gap: 16px;
+  }
+  .nav__link {
+    padding: 6px 12px;
+    color: $text;
+    opacity: 0.8;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .nav__link.is-active,
+  .nav__link:hover {
+    border-bottom-color: $accent;
+    opacity: 1;
+    background: transparent;
+  }
+}
+
+/* Hero */
+.hero {
+  background: radial-gradient(
+      1200px 400px at 20% -20%,
+      rgba(229, 9, 20, 0.6),
+      transparent
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent);
+  border-radius: $radius;
+  height: 40vh;
+  display: grid;
+  place-items: center start;
+  padding-left: 24px;
+  margin-bottom: 16px;
+  position: relative;
+
+  .hero__text {
+    position: absolute;
+    z-index: 2;
+    margin: 0px 32px 40px 32px;
+    color: white;
+
+    h1 {
+      font-size: 40px;
+      margin: 0 0 8px;
+    }
+    p {
+      margin: 0;
+      color: $text;
+      max-width: 800px;
+    }
+  }
+  .hero__carousel-item {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    position: absolute;
+    align-items: end;
+
+    top: 0;
+    left: 0;
+  }
+
+  .hero__carousel-item:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: $radius;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.9);
+  }
+
+  .hero__carousel-item img {
+    border-radius: $radius;
+    object-fit: cover;
+    height: 40vh;
+  }
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn--primary {
+  background: $accent;
+  color: white;
+}
+
+.btn--wishlist-primary {
+  background: transparent;
+  color: $accent;
+}
+
+/* Carousel */
+.carousel {
+  margin: 48px 0;
+}
+.carousel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.carousel__title {
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.carousel__wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  .carousel__scroller {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    scroll-behavior: smooth;
+
+    /* ocultar scroll bar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .carousel__gradient {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    pointer-events: none; /* no bloquea clics */
+    z-index: 5;
+
+    &--left {
+      left: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.8), transparent);
+    }
+
+    &--right {
+      right: 0;
+      background: linear-gradient(to left, rgba(0, 0, 0, 0.8), transparent);
+    }
+  }
+
+  .carousel__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    border: none;
+    background: transparent;
+    color: white;
+
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .carousel__arrow--left {
+    left: 0;
+  }
+
+  .carousel__arrow--right {
+    right: 0;
+  }
+
+  &:hover .carousel__arrow {
+    opacity: 1;
+  }
+}
+
+/* Movie */
+.movie {
+  position: relative;
+  flex: 0 0 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: $bg-elev;
+  img {
+    width: 220px;
+    height: 330px;
+    object-fit: cover;
+  }
+}
+
+.movie__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.7));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.movie:hover .movie__overlay {
+  opacity: 1;
+}
+.movie__title {
+  font-weight: 600;
+}
+
+/* Detail page with category-based font differences */
+.detail .category--popular .detail__title {
+  font-family: $font-cat-popular;
+  letter-spacing: 1px;
+  font-size: 48px;
+}
+.detail .category--top_rated .detail__title {
+  font-family: $font-cat-top_rated;
+  text-transform: uppercase;
+}
+.detail .category--now_playing .detail__title {
+  font-family: $font-cat-now_playing;
+}
+.detail__banner {
+  background: radial-gradient(
+      1200px 400px at 20% -20%,
+      rgba(229, 9, 20, 0.6),
+      transparent
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent);
+  border-radius: $radius;
+  height: 40vh;
+  display: grid;
+  place-items: center start;
+
+  margin-bottom: 16px;
+  position: relative;
+  img {
+    border-radius: $radius;
+    object-fit: cover;
+    height: 40vh;
+  }
+}
+.detail__content {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  align-items: start;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0), $bg);
+}
+.detail__poster {
+  width: 240px;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.detail__meta {
+  padding: 24px;
+  background: $bg;
+  border-radius: 12px;
+}
+.detail__title {
+  margin: 0 0 12px;
+}
+.detail__overview {
+  color: $muted;
+  max-width: 70ch;
+}
+.detail__actions {
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+}
+.detail__info {
+  display: flex;
+  gap: 20px;
+  color: $muted;
+}
+
+/* Wishlist */
+.wishlist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: $gap;
+}
+.wishlist__item {
+  background: $bg-elev;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-direction: column;
+}
+.wishlist__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  flex-direction: column;
+  height: 100%;
+}
+
+.wishlist__title {
+  font-size: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* === Category-aware theming for Movie Detail === */
+/* Import a few display fonts for category-specific titles */
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Merriweather:wght@700&family=Fira+Sans:wght@700&family=Playfair+Display:wght@700&family=Montserrat:wght@700&display=swap");
+
+/* Badge element */
+.detail__badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+}
+
+/* Default overrides (General) */
+.detail.category--general .detail__title {
+  font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto,
+    sans-serif;
+}
+.detail.category--general .btn--wishlist-primary {
+  background: #7c4dff;
+  color: #fff;
+}
+.detail.category--general .detail__poster {
+  box-shadow: 0 10px 24px rgba(124, 77, 255, 0.25);
+}
+
+/* Home categories */
+.detail.category--popular .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+  letter-spacing: 0.5px;
+}
+.detail.category--popular .btn--wishlist-primary {
+  background: #e53935;
+  color: #fff;
+}
+.detail.category--popular .detail__banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(229, 57, 53, 0.25),
+    rgba(0, 0, 0, 0.6)
+  );
+  pointer-events: none;
+}
+
+.detail.category--top_rated .detail__title {
+  font-family: "Merriweather", Georgia, "Times New Roman", serif;
+}
+.detail.category--top_rated .btn--wishlist-primary {
+  background: #43a047;
+  color: #fff;
+}
+.detail.category--top_rated .detail__poster {
+  outline: 3px solid rgba(67, 160, 71, 0.35);
+  outline-offset: 4px;
+}
+
+.detail.category--now_playing .detail__title {
+  font-family: "Fira Sans", system-ui, -apple-system, Segoe UI, Roboto,
+    sans-serif;
+}
+.detail.category--now_playing .btn--wishlist-primary {
+  background: #039be5;
+  color: #fff;
+}
+.detail.category--now_playing .detail__banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 155, 229, 0.2),
+    rgba(0, 0, 0, 0.6)
+  );
+  pointer-events: none;
+}
+
+/* Genre-based categories from /categories page (normalize to lowercase & underscores) */
+.detail.category--action .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+}
+.detail.category--action .btn--wishlist-primary {
+  background: #ff7043;
+  color: #fff;
+}
+.detail.category--action .detail__poster {
+  box-shadow: 0 10px 24px rgba(255, 112, 67, 0.35);
+}
+
+.detail.category--adventure .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--adventure .btn--wishlist-primary {
+  background: #26a69a;
+  color: #fff;
+}
+
+.detail.category--animation .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--animation .btn--wishlist-primary {
+  background: #7e57c2;
+  color: #fff;
+}
+
+.detail.category--comedy .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--comedy .btn--wishlist-primary {
+  background: #fdd835;
+  color: #000;
+}
+
+.detail.category--crime .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--crime .btn--wishlist-primary {
+  background: #6d4c41;
+  color: #fff;
+}
+
+.detail.category--documentary .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--documentary .btn--wishlist-primary {
+  background: #00897b;
+  color: #fff;
+}
+
+.detail.category--drama .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--drama .btn--wishlist-primary {
+  background: #8e24aa;
+  color: #fff;
+}
+
+.detail.category--family .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--family .btn--wishlist-primary {
+  background: #ef6c00;
+  color: #fff;
+}
+
+.detail.category--fantasy .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--fantasy .btn--wishlist-primary {
+  background: #5e35b1;
+  color: #fff;
+}
+
+.detail.category--history .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--history .btn--wishlist-primary {
+  background: #bf360c;
+  color: #fff;
+}
+
+.detail.category--horror .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+}
+.detail.category--horror .btn--wishlist-primary {
+  background: #c62828;
+  color: #fff;
+}
+.detail.category--horror .detail__poster {
+  filter: grayscale(25%);
+}
+
+.detail.category--music .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--music .btn--wishlist-primary {
+  background: #3949ab;
+  color: #fff;
+}
+
+.detail.category--mystery .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--mystery .btn--wishlist-primary {
+  background: #546e7a;
+  color: #fff;
+}
+
+.detail.category--romance .detail__title {
+  font-family: "Playfair Display", Georgia, serif;
+}
+.detail.category--romance .btn--wishlist-primary {
+  background: #e91e63;
+  color: #fff;
+}
+
+.detail.category--science_fiction .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+  letter-spacing: 0.4px;
+}
+.detail.category--science_fiction .btn--wishlist-primary {
+  background: #00acc1;
+  color: #fff;
+}
+.detail.category--science_fiction .detail__meta {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.detail.category--tv_movie .detail__title {
+  font-family: "Montserrat", system-ui, sans-serif;
+}
+.detail.category--tv_movie .btn--wishlist-primary {
+  background: #8d6e63;
+  color: #fff;
+}
+
+.detail.category--thriller .detail__title {
+  font-family: "Bebas Neue", Impact, Haettenschweiler, "Arial Narrow Bold",
+    sans-serif;
+}
+.detail.category--thriller .btn--wishlist-primary {
+  background: #455a64;
+  color: #fff;
+}
+
+.detail.category--war .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--war .btn--wishlist-primary {
+  background: #a1887f;
+  color: #fff;
+}
+
+.detail.category--western .detail__title {
+  font-family: "Merriweather", Georgia, serif;
+}
+.detail.category--western .btn--wishlist-primary {
+  background: #6d4c41;
+  color: #fff;
+}
+
+/* Utility: ensure banner can host a pseudo-element overlay */
+.detail__banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
